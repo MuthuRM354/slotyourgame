@@ -7,23 +7,21 @@ import Grounds from "./pages/Grounds";
 import Matches from "./pages/Matches";
 import Tournaments from "./pages/Tournaments";
 import Login from "./pages/Login";
-import PostMatch from "./pages/PostMatch";
 import AdminDashboard from "./pages/AdminDashboard";
 import OrganizerDashboard from "./pages/OrganizerDashboard";
 import CaptainDashboard from "./pages/CaptainDashboard";
 
 export default function App() {
   return (
-    <div className="app-shell">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
-      <main className="container main-content">
+      <main className="flex-1 container mx-auto px-4 py-8">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/grounds" element={<Grounds />} />
           <Route path="/matches" element={<Matches />} />
           <Route path="/tournaments" element={<Tournaments />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/post-match" element={<PostMatch />} />
 
           <Route path="/admin/dashboard" element={
             <ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>

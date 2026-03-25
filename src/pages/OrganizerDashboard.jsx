@@ -1,130 +1,121 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import { useAppContext } from "../context/AppContext";
+import { useData } from "../context/DataContext";
+import SportyCard from "../components/SportyCard";
 
 export default function OrganizerDashboard() {
   const { user } = useAuth();
-  const { state, dispatch } = useAppContext();
+  const { data } = useData();
   const [tab, setTab] = useState("grounds");
 
-  const organizer = state.organizers.find((o) => o.id === user.id);
-  const myGrounds = state.grounds.filter((g) => g.organizerId === user.id);
-  const myTournaments = state.tournaments.filter((t) => t.organizerId === user.id);
+  const organizer = data.organizers.find((o) => o.userId === user.id);
+  const myGrounds = data.grounds.filter((g) => organizer?.grounds.includes(g.id));
 
-  const [groundForm, setGroundForm] = useState({
-    name: "", area: "OMR", type: "open-ground leather", pitchType: "matting", pricePerHour: 2000
-  });
-  const [tourForm, setTourForm] = useState({
-    name: "", season: "Summer 2026", locationArea: "OMR", ballType: "tennis", startDate: "", endDate: "", numberOfTeams: 8, prizePool: "₹50,000"
-  });
-  const [verifyForm, setVerifyForm] = useState({ idProof: "", photos: "" });
-
-  const inventoryRows = useMemo(
-    () => myGrounds.flatMap((g) => g.availableSlots.map((s, i) => ({ key: `${g.id}-${i}`, ground: g.name, ...s }))),
-    [myGrounds]
-  );
-
-  const addGround = (e) => {
-    e.preventDefault();
-    dispatch({
-      type: "ADD_GROUND",
-      payload: {
-        id: `g${Date.now()}`,
-        organizerId: user.id,
-        ...groundForm,
-        pricePerHour: Number(groundForm.pricePerHour),
-        ballTypeSupported: groundForm.type.includes("leather") ? ["leather"] : ["tennis"],
-        availableSlots: [],
-        isVerified: organizer?.status === "approved",
-        organizerContact: user.phone,
-        googleMapsLink: "https://maps.google.com"
-      }
-    });
-    setGroundForm({ name: "", area: "OMR", type: "open-ground leather", pitchType: "matting", pricePerHour: 2000 });
-  };
-
-  const addTournament = (e) => {
-    e.preventDefault();
-    dispatch({
-      type: "ADD_TOURNAMENT",
-      payload: {
-        id: `t${Date.now()}`,
-        organizerId: user.id,
-        ...tourForm,
-        status: "upcoming",
-        numberOfTeams: Number(tourForm.numberOfTeams),
-        usesCricHeroes: false,
-        cricHeroesLink: ""
-      }
-    });
-  };
-
-  const requestVerification = (e) => {
-    e.preventDefault();
-    dispatch({
-      type: "ADD_VERIFICATION_REQUEST",
-      payload: { id: `vr${Date.now()}`, organizerId: user.id, ...verifyForm, status: "submitted" }
-    });
-    setVerifyForm({ idProof: "", photos: "" });
-  };
+  const tabs = [
+    { id: "grounds", label: "🏟 My Grounds", count: myGrounds.length },
+    { id: "tournaments", label: "🏆 Tournaments", count: 0 },
+    { id: "verification", label: "✓ Verification", count: 0 },
+  ];
 
   return (
-    <div className="stack">
-      <h2>Organizer Dashboard</h2>
-      {organizer?.status !== "approved" && <p className="badge warning">Pending admin approval</p>}
+    <div>
+      <motion.h1
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-4xl font-bold text-cricket-green mb-8"
+      >
+        Organizer Dashboard
+      </motion.h1>
 
-      <div className="tabbar">
-        <button className={`btn ${tab === "grounds" ? "btn-primary" : "btn-outline"}`} onClick={() => setTab("grounds")}>My Grounds</button>
-        <button className={`btn ${tab === "inventory" ? "btn-primary" : "btn-outline"}`} onClick={() => setTab("inventory")}>Inventory</button>
-        <button className={`btn ${tab === "tournaments" ? "btn-primary" : "btn-outline"}`} onClick={() => setTab("tournaments")}>My Tournaments</button>
-      </div>
+      {!organizer?.isVerified && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-6 rounded"
+        >
+          <p className="font-semibold text-yellow-800">⏳ Your organization is pending admin verification</p>
+        </motion.div>
+      )}
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex gap-4 mb-8 flex-wrap"
+      >
+        {tabs.map((t) => (
+          <motion.button
+            key={t.id}
+            whileHover={{ scale: 1.05 }}
+            onClick={() => setTab(t.id)}
+            className={`px-6 py-3 rounded-lg font-bold flex items-center gap-2 ${
+              tab === t.id
+                ? "btn-primary"
+                : "border-2 border-cricket-green text-cricket-green hover:bg-cricket-green hover:text-white"
+            }`}
+          >
+            {t.label}
+            {t.count > 0 && <span className="bg-icc-gold text-black px-2 rounded-full text-sm">{t.count}</span>}
+          </motion.button>
+        ))}
+      </motion.div>
 
       {tab === "grounds" && (
-        <section className="card">
-          <h3>My Grounds</h3>
-          <ul>{myGrounds.map((g) => <li key={g.id}>{g.name} ({g.area})</li>)}</ul>
-          <form className="form-grid" onSubmit={addGround}>
-            <input placeholder="Ground name" value={groundForm.name} onChange={(e) => setGroundForm({ ...groundForm, name: e.target.value })} required />
-            <input placeholder="Area" value={groundForm.area} onChange={(e) => setGroundForm({ ...groundForm, area: e.target.value })} required />
-            <input placeholder="Type" value={groundForm.type} onChange={(e) => setGroundForm({ ...groundForm, type: e.target.value })} required />
-            <input placeholder="Pitch Type" value={groundForm.pitchType} onChange={(e) => setGroundForm({ ...groundForm, pitchType: e.target.value })} required />
-            <input type="number" placeholder="Price per hour" value={groundForm.pricePerHour} onChange={(e) => setGroundForm({ ...groundForm, pricePerHour: e.target.value })} required />
-            <button className="btn btn-primary">Add New Ground</button>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          {myGrounds.map((ground, i) => (
+            <SportyCard key={ground.id} delay={i * 0.05}>
+              <h3 className="text-xl font-bold text-cricket-green mb-2">{ground.name}</h3>
+              <div className="space-y-2 text-sm text-gray-700">
+                <p><strong>Area:</strong> {ground.area}</p>
+                <p><strong>Type:</strong> {ground.ballType}</p>
+                <p><strong>Price:</strong> ₹{ground.pricePerHour}/hr</p>
+                <p><strong>Slots:</strong> {ground.availableSlots.length} available</p>
+              </div>
+              <motion.button whileHover={{ scale: 1.05 }} className="w-full mt-4 btn-primary">
+                Edit Ground
+              </motion.button>
+            </SportyCard>
+          ))}
+          <SportyCard>
+            <h3 className="text-xl font-bold text-cricket-green mb-4">➕ Add New Ground</h3>
+            <form className="space-y-3">
+              <input placeholder="Ground Name" className="w-full border rounded px-3 py-2" />
+              <input placeholder="Area" className="w-full border rounded px-3 py-2" />
+              <select className="w-full border rounded px-3 py-2">
+                <option>Leather</option>
+                <option>Tennis</option>
+              </select>
+              <input type="number" placeholder="Price/hr" className="w-full border rounded px-3 py-2" />
+              <motion.button whileHover={{ scale: 1.05 }} className="w-full btn-primary">
+                Add Ground
+              </motion.button>
+            </form>
+          </SportyCard>
+        </motion.div>
+      )}
+
+      {tab === "verification" && (
+        <SportyCard>
+          <h3 className="text-xl font-bold text-cricket-green mb-4">Upload Verification Documents</h3>
+          <form className="space-y-4">
+            <div>
+              <label className="block font-semibold mb-2">ID Proof</label>
+              <input type="file" className="w-full border rounded px-3 py-2" />
+            </div>
+            <div>
+              <label className="block font-semibold mb-2">Ground Photos</label>
+              <input type="file" multiple className="w-full border rounded px-3 py-2" />
+            </div>
+            <motion.button whileHover={{ scale: 1.05 }} className="w-full btn-primary">
+              Submit for Verification
+            </motion.button>
           </form>
-        </section>
+        </SportyCard>
       )}
-
-      {tab === "inventory" && (
-        <section className="card">
-          <h3>Inventory</h3>
-          <ul>{inventoryRows.map((r) => <li key={r.key}>{r.ground}: {r.date} {r.start}-{r.end}</li>)}</ul>
-        </section>
-      )}
-
-      {tab === "tournaments" && (
-        <section className="card">
-          <h3>My Tournaments</h3>
-          <ul>{myTournaments.map((t) => <li key={t.id}>{t.name} ({t.startDate} to {t.endDate})</li>)}</ul>
-          <form className="form-grid" onSubmit={addTournament}>
-            <input placeholder="Tournament name" value={tourForm.name} onChange={(e) => setTourForm({ ...tourForm, name: e.target.value })} required />
-            <input placeholder="Season" value={tourForm.season} onChange={(e) => setTourForm({ ...tourForm, season: e.target.value })} />
-            <input placeholder="Area" value={tourForm.locationArea} onChange={(e) => setTourForm({ ...tourForm, locationArea: e.target.value })} required />
-            <input placeholder="Ball Type" value={tourForm.ballType} onChange={(e) => setTourForm({ ...tourForm, ballType: e.target.value })} required />
-            <input type="date" value={tourForm.startDate} onChange={(e) => setTourForm({ ...tourForm, startDate: e.target.value })} required />
-            <input type="date" value={tourForm.endDate} onChange={(e) => setTourForm({ ...tourForm, endDate: e.target.value })} required />
-            <button className="btn btn-primary">Create Tournament</button>
-          </form>
-        </section>
-      )}
-
-      <section className="card">
-        <h3>Verification Upload</h3>
-        <form className="form-grid" onSubmit={requestVerification}>
-          <input placeholder="ID proof file name" value={verifyForm.idProof} onChange={(e) => setVerifyForm({ ...verifyForm, idProof: e.target.value })} required />
-          <input placeholder="Ground photo file name(s)" value={verifyForm.photos} onChange={(e) => setVerifyForm({ ...verifyForm, photos: e.target.value })} required />
-          <button className="btn btn-outline">Request Verification</button>
-        </form>
-      </section>
     </div>
   );
 }

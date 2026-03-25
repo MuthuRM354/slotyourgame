@@ -1,0 +1,24 @@
+{
+  "users": [
+    {"id":1,"role":"admin","name":"Platform Admin","email":"admin@cricketplatform.in","password":"admin123","phone":"9999999999"},
+    {"id":2,"role":"organizer","name":"Abdul Rahman","email":"abdul@omrgrounds.com","password":"abdul123","phone":"9840807971","isVerified":false,"pendingVerification":true},
+    {"id":3,"role":"captain","name":"Muthu RM","email":"muthu@kuwy.com","password":"muthu123","phone":"9876543210","teams":[1,2]}
+  ],
+  "teams": [
+    {"id":1,"name":"Renaissance CC","captainId":3,"company":"Kuwy Technology","level":"corporate","area":"OMR","cricHeroes":"https://cricheroes.com/team/renaissance"},
+    {"id":2,"name":"Muthu XI","captainId":3,"company":null,"level":"serious amateur","area":"Velachery","cricHeroes":null}
+  ],
+  "organizers": [
+    {"id":1,"userId":2,"name":"Abdul Grounds","grounds":[1,3],"isVerified":false,"verificationDocs":["ID proof","Ground photos"]}
+  ],
+  "grounds": [
+    {"id":1,"name":"Navalur Open Ground","organizerId":1,"area":"OMR","ballType":"leather","pricePerHour":2500,"availableSlots":["2026-03-29 08:00-12:00","2026-03-30 07:30-11:30"]},
+    {"id":3,"name":"Thorapakkam Turf","organizerId":1,"area":"OMR","ballType":"tennis","pricePerHour":1800,"availableSlots":["2026-03-30 09:00-13:00"]}
+  ],
+  "matches": [
+    {"id":1,"groundId":1,"date":"2026-03-29","startTime":"08:00","endTime":"12:00","ballType":"leather","format":"T20","level":"serious amateur","status":"open","organizerTeamName":"Renaissance CC","lookingForOpponent":true,"notes":"Looking for strong opening bowler team"}
+  ],
+  "tournaments": [
+    {"id":1,"name":"Chennai Corporate Premier League 2026 S2","season":"2026","locationArea":"OMR","ballType":"tennis","startDate":"2026-04-01","endDate":"2026-04-30","status":"upcoming","numberOfTeams":16,"prizePool":30000,"usesCricHeroes":true,"cricHeroesLink":"https://cricheroes.com/tournament/ccpl2026"}
+  ]
+}

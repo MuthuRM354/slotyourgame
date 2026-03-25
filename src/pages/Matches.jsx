@@ -1,35 +1,58 @@
+import { motion } from "framer-motion";
+import { useData } from "../context/DataContext";
 import { useAuth } from "../context/AuthContext";
-import { useAppContext } from "../context/AppContext";
+import SportyCard from "../components/SportyCard";
 
 export default function Matches() {
+  const { data } = useData();
   const { user } = useAuth();
-  const { state, dispatch } = useAppContext();
 
-  const handleBook = (groundId) => {
-    if (!user || user.role !== "captain") return;
-    dispatch({
-      type: "ADD_BOOKING",
-      payload: { id: `b${Date.now()}`, captainUserId: user.id, groundId, date: "2026-04-02", start: "06:00", end: "08:00" }
-    });
-  };
+  const groundMap = Object.fromEntries(data.grounds.map((g) => [g.id, g]));
 
   return (
-    <div className="stack">
-      <h2>Match Listings</h2>
-      <section className="grid-3">
-        {state.matches.map((m) => {
-          const g = state.grounds.find((x) => x.id === m.groundId);
+    <div>
+      <motion.h2
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-4xl font-bold text-cricket-green mb-8"
+      >
+        ⚾ Match Listings
+      </motion.h2>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
+        {data.matches.map((match, i) => {
+          const ground = groundMap[match.groundId];
           return (
-            <article className="card" key={m.id}>
-              <h3>{g?.name || "Ground"}</h3>
-              <p>{m.date} {m.startTime}-{m.endTime}</p>
-              <p>{m.ballType} | {m.level}</p>
-              <p>Team: {m.organizerTeamName}</p>
-              {user?.role === "captain" && <button className="btn btn-primary" onClick={() => handleBook(m.groundId)}>Book this</button>}
-            </article>
+            <SportyCard key={match.id} delay={i * 0.05}>
+              <h3 className="text-xl font-bold text-cricket-green mb-2">{ground?.name}</h3>
+              <div className="space-y-2 text-gray-700 text-sm mb-4">
+                <p><strong>Date:</strong> {match.date}</p>
+                <p><strong>Time:</strong> {match.startTime} - {match.endTime}</p>
+                <p><strong>Ball:</strong> {match.ballType.toUpperCase()}</p>
+                <p><strong>Team:</strong> {match.organizerTeamName}</p>
+                <p><strong>Level:</strong> {match.level}</p>
+                {match.lookingForOpponent && (
+                  <span className="inline-block bg-icc-gold text-black px-2 py-1 rounded text-xs font-bold mt-2">
+                    🔍 Looking for Opponent
+                  </span>
+                )}
+              </div>
+              {user?.role === "captain" && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  className="w-full btn-primary"
+                >
+                  Book This →
+                </motion.button>
+              )}
+            </SportyCard>
           );
         })}
-      </section>
+      </motion.div>
     </div>
   );
 }
