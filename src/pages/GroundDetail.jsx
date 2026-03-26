@@ -1,55 +1,35 @@
-import { useParams } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
+import { useParams, Link } from "react-router-dom";
+import { useData } from "../context/DataContext";
+import { motion } from "framer-motion";
 
 export default function GroundDetail() {
   const { id } = useParams();
-  const { state } = useAppContext();
+  const { data } = useData();
 
-  const ground = state.grounds.find((g) => g.id === id);
+  const ground = data.grounds.find((g) => String(g.id) === String(id));
   if (!ground) return <p>Ground not found.</p>;
 
-  const recentMatches = state.matches.filter((m) => m.groundId === id).slice(0, 3);
-
   return (
-    <div className="stack">
-      <h2>{ground.name}</h2>
-      <p>{ground.area} | {ground.type}</p>
-      <p>Pitch: {ground.pitchType}</p>
-      <p>Supported formats: {ground.ballTypeSupported.join(", ")}</p>
-      <a className="btn btn-outline" href={ground.googleMapsLink} target="_blank" rel="noreferrer">
-        Open Map
-      </a>
+    <div className="space-y-6">
+      <Link to="/grounds" className="text-cricket-green font-semibold">← Back to Grounds</Link>
 
-      <section className="banner">No convenience fees</section>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-xl shadow-lg p-6">
+        <h1 className="text-3xl font-bold text-cricket-green mb-2">{ground.name}</h1>
+        <p className="text-gray-700"><strong>Area:</strong> {ground.area}</p>
+        <p className="text-gray-700"><strong>Ball Type:</strong> {ground.ballType}</p>
+        <p className="text-gray-700"><strong>Price:</strong> ₹{ground.pricePerHour}/hr</p>
+      </motion.div>
 
-      <section className="card">
-        <h3>Available Slots</h3>
-        <ul>
-          {ground.availableSlots.map((s, i) => (
-            <li key={i}>{s.date} | {s.start} - {s.end}</li>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white rounded-xl shadow-lg p-6">
+        <h2 className="text-2xl font-bold text-cricket-green mb-4">Available Slots</h2>
+        <ul className="space-y-2">
+          {ground.availableSlots.map((slot, idx) => (
+            <li key={idx} className="border border-gray-200 rounded-lg px-4 py-2">
+              {slot}
+            </li>
           ))}
         </ul>
-      </section>
-
-      <section className="card">
-        <h3>Request Booking</h3>
-        <form className="form-grid">
-          <input placeholder="Team Name" />
-          <input placeholder="Captain Name" />
-          <input placeholder="Phone" />
-          <input type="date" />
-          <button type="button" className="btn btn-primary">Request Slot</button>
-        </form>
-      </section>
-
-      <section className="card">
-        <h3>Recent matches</h3>
-        {recentMatches.length ? (
-          <ul>{recentMatches.map((m) => <li key={m.id}>{m.organizerTeamName} - {m.date}</li>)}</ul>
-        ) : (
-          <p>Recent matches data will be available soon.</p>
-        )}
-      </section>
+      </motion.div>
     </div>
   );
 }

@@ -4,9 +4,11 @@ import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Grounds from "./pages/Grounds";
+import GroundDetail from "./pages/GroundDetail";
 import Matches from "./pages/Matches";
 import Tournaments from "./pages/Tournaments";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
 import OrganizerDashboard from "./pages/OrganizerDashboard";
 import CaptainDashboard from "./pages/CaptainDashboard";
@@ -19,9 +21,10 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/grounds" element={<Grounds />} />
-          <Route path="/matches" element={<Matches />} />
+          <Route path="/grounds/:id" element={<GroundDetail />} />
           <Route path="/tournaments" element={<Tournaments />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
           <Route path="/admin/dashboard" element={
             <ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>

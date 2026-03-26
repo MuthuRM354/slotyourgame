@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Menu, X, LogOut } from "lucide-react";
 import { useState } from "react";
+import { u } from "framer-motion/client";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -29,7 +30,7 @@ export default function Navbar() {
           {user?.role === "admin" && <Link to="/admin/dashboard" className="text-cricket-green font-bold">Admin</Link>}
           {user?.role === "organizer" && <Link to="/organizer/dashboard" className="text-cricket-green font-bold">Organizer</Link>}
           {user?.role === "captain" && <Link to="/captain/dashboard" className="text-cricket-green font-bold">Captain</Link>}
-
+          <Link to="/register" className="text-gray-700 hover:text-cricket-green font-semibold">Register</Link>
           {user ? (
             <button onClick={handleLogout} className="btn-secondary flex items-center gap-2">
               <LogOut size={18} /> Logout
@@ -37,7 +38,9 @@ export default function Navbar() {
           ) : (
             <Link to="/login" className="btn-primary">Login</Link>
           )}
-        </div>
+        </div>  
+
+       
 
         <button className="md:hidden" onClick={() => setOpen(!open)}>
           {open ? <X size={24} /> : <Menu size={24} />}
