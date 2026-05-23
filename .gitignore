@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# dev-only scripts that read secrets — run locally, never commit with keys
+supabase/seed.mjs
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

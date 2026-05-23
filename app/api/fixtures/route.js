@@ -59,18 +59,5 @@ export async function POST(request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Fire n8n webhook
-  const webhookUrl = process.env.N8N_FIXTURE_WEBHOOK_URL
-  if (webhookUrl) {
-    fetch(webhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-webhook-secret': process.env.N8N_WEBHOOK_SECRET ?? '',
-      },
-      body: JSON.stringify({ fixture, team_id: fixture.team_id }),
-    }).catch(() => {})
-  }
-
   return NextResponse.json(fixture, { status: 201 })
 }

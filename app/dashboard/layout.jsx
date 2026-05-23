@@ -16,7 +16,7 @@ export default async function DashboardLayout({ children }) {
     .single()
 
   return (
-    <div className="flex h-screen bg-gray-950 overflow-hidden">
+    <div className="flex h-screen bg-[#030711] overflow-hidden">
       <Sidebar role={profile?.role} />
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar user={user} profile={profile} />

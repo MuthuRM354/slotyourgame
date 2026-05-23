@@ -24,11 +24,11 @@ export default function PlayerRow({ player, currentUserRole, currentUserId }) {
   }
 
   return (
-    <tr className="border-b border-gray-800 last:border-0 hover:bg-gray-800/40 transition">
+    <tr className="border-b border-[#1c2432] last:border-0 hover:bg-[#1a2030]/40 transition">
       <td className="p-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center shrink-0">
-            <User size={14} className="text-gray-400" />
+          <div className="w-8 h-8 rounded-full bg-[#1c2432] flex items-center justify-center shrink-0">
+            <User size={14} className="text-slate-400" />
           </div>
           <div>
             <p className="text-white font-medium text-sm">{player.full_name}</p>
@@ -66,7 +66,7 @@ export default function PlayerRow({ player, currentUserRole, currentUserId }) {
                 value={cricheroes}
                 onChange={(e) => setCricheroes(e.target.value)}
                 placeholder="CricHeroes ID"
-                className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-white w-28 focus:outline-none focus:ring-1 focus:ring-green-500"
+                className="bg-[#0a0f18] border border-[#1c2432] rounded-lg px-2 py-1 text-xs text-white w-28 focus:outline-none focus:ring-1 focus:ring-green-500/50"
               />
               <button
                 type="submit"

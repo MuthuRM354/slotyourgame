@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+﻿import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import PlayerRow from '@/components/roster/PlayerRow'
 import RoleGuard from '@/components/shared/RoleGuard'
@@ -16,9 +16,10 @@ export default async function RosterPage() {
     .eq('id', user.id)
     .single()
 
-  // League admins see all, captains/players see their team
+  // League admins and super admins see all, captains/players see their team
+  const isAdmin = ['league_admin', 'super_admin'].includes(profile?.role)
   let query = supabase.from('profiles').select('*, teams(name)')
-  if (profile?.role !== 'league_admin') {
+  if (!isAdmin) {
     query = query.eq('team_id', profile?.team_id)
   }
   const { data: players } = await query.order('full_name')
@@ -27,20 +28,20 @@ export default async function RosterPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white">
-          {profile?.role === 'league_admin' ? 'All Players' : 'Team Roster'}
+          {isAdmin ? 'All Players' : 'Team Roster'}
         </h2>
         <span className="text-sm text-gray-400">{players?.length ?? 0} players</span>
       </div>
 
-      <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+      <div className="bg-[#0c1117] rounded-xl border border-[#1c2432] overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wider">
+            <tr className="border-b border-[#1c2432] text-xs text-gray-500 uppercase tracking-wider">
               <th className="text-left p-4">Player</th>
               <th className="text-left p-4 hidden sm:table-cell">Role</th>
               <th className="text-left p-4 hidden md:table-cell">Team</th>
               <th className="text-left p-4 hidden sm:table-cell">CricHeroes</th>
-              {profile?.role !== 'player' && <th className="text-right p-4">Actions</th>}
+              {profile?.role !== 'player' && profile?.role !== 'ground_admin' && <th className="text-right p-4">Actions</th>}
             </tr>
           </thead>
           <tbody>
