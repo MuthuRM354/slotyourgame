@@ -11,14 +11,14 @@ import { CheckCircle2, XCircle, HelpCircle, Users, Calendar, Clock } from 'lucid
 const RSVP_OPTIONS = [
   {
     status: 'attending',
-    label: 'I'm In',
+    label: "I'm In",
     icon: CheckCircle2,
     color: 'bg-green-500/10 hover:bg-green-500/20 border-green-700/40 text-green-400',
     activeColor: 'bg-green-500/30 border-green-400 text-green-300',
   },
   {
     status: 'not_attending',
-    label: 'Can't Make It',
+    label: "Can't Make It",
     icon: XCircle,
     color: 'bg-red-500/10 hover:bg-red-500/20 border-red-700/40 text-red-400',
     activeColor: 'bg-red-500/30 border-red-400 text-red-300',
