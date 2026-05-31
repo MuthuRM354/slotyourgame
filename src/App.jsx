@@ -4,25 +4,25 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import RoleGuard from '@/components/auth/RoleGuard'
 
 // Public pages
-import Home from '@/pages/Home'
-import Login from '@/pages/auth/Login'
-import Register from '@/pages/auth/Register'
-import DiscoverTurfs from '@/pages/turfs/DiscoverTurfs'
-import TurfDetail from '@/pages/turfs/TurfDetail'
+import Home from './views/Home'
+import Login from './views/auth/Login'
+import Register from './views/auth/Register'
+import DiscoverTurfs from './views/turfs/DiscoverTurfs'
+import TurfDetail from './views/turfs/TurfDetail'
 
 // Authenticated pages
-import BookTurf from '@/pages/bookings/BookTurf'
-import BookingHistory from '@/pages/bookings/BookingHistory'
-import WalletPage from '@/pages/wallet/WalletPage'
-import Dashboard from '@/pages/dashboard/Dashboard'
-import Profile from '@/pages/profile/Profile'
+import BookTurf from './views/bookings/BookTurf'
+import BookingHistory from './views/bookings/BookingHistory'
+import WalletPage from './views/wallet/WalletPage'
+import Dashboard from './views/dashboard/Dashboard'
+import Profile from './views/profile/Profile'
 
 // Role-specific
-import VenueOwnerDashboard from '@/pages/venue/VenueOwnerDashboard'
-import AdminDashboard from '@/pages/admin/AdminDashboard'
+import VenueOwnerDashboard from './views/venue/VenueOwnerDashboard'
+import AdminDashboard from './views/admin/AdminDashboard'
 
 // 404
-import NotFound from '@/pages/NotFound'
+import NotFound from './views/NotFound'
 
 export default function App() {
   return (
