@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react'
+import { Eye, EyeOff, Loader2, ArrowRight, AlertCircle } from 'lucide-react'
 
 export default function LoginForm() {
   const router  = useRouter()
@@ -27,49 +27,83 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+
+      {/* Error banner */}
       {error && (
-        <div className="flex items-start gap-2.5 bg-red-500/10 border border-red-500/25 text-red-400 text-sm px-4 py-3 rounded-xl">
-          <span className="mt-0.5">⚠</span> {error}
+        <div className="flex items-start gap-3 bg-red-500/8 border border-red-500/20 text-red-400 text-sm px-4 py-3.5 rounded-xl animate-fade-in">
+          <AlertCircle size={15} className="mt-0.5 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Email</label>
+      {/* Email */}
+      <div className="space-y-2">
+        <label className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+          Email address
+        </label>
         <input
-          type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
           placeholder="you@example.com"
-          className="w-full bg-[#0a0f18] border border-[#1c2432] hover:border-slate-600 focus:border-green-500/60 focus:ring-1 focus:ring-green-500/20 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition"
+          className="input-field"
+          autoComplete="email"
         />
       </div>
 
-      <div className="space-y-1.5">
+      {/* Password */}
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Password</label>
+          <label className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+            Password
+          </label>
         </div>
         <div className="relative">
           <input
-            type={show ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required
+            type={show ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
             placeholder="••••••••"
-            className="w-full bg-[#0a0f18] border border-[#1c2432] hover:border-slate-600 focus:border-green-500/60 focus:ring-1 focus:ring-green-500/20 rounded-xl px-4 py-3 pr-11 text-sm text-white placeholder-slate-600 outline-none transition"
+            className="input-field pr-11"
+            autoComplete="current-password"
           />
-          <button type="button" onClick={() => setShow((s) => !s)}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition">
-            {show ? <EyeOff size={16} /> : <Eye size={16} />}
+          <button
+            type="button"
+            onClick={() => setShow((s) => !s)}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-0.5"
+            tabIndex={-1}
+          >
+            {show ? <EyeOff size={15} /> : <Eye size={15} />}
           </button>
         </div>
       </div>
 
+      {/* Submit */}
       <button
-        type="submit" disabled={loading}
-        className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-400 active:bg-green-600 disabled:opacity-50 text-black font-bold py-3 rounded-xl transition text-sm"
+        type="submit"
+        disabled={loading}
+        className="w-full flex items-center justify-center gap-2.5 btn-primary py-3.5 rounded-xl text-sm mt-2 disabled:opacity-60 disabled:pointer-events-none"
       >
-        {loading ? <><Loader2 size={15} className="animate-spin" /> Signing in…</> : <>Sign In <ArrowRight size={15} /></>}
+        {loading ? (
+          <>
+            <Loader2 size={15} className="animate-spin" />
+            Signing in…
+          </>
+        ) : (
+          <>
+            Sign In
+            <ArrowRight size={15} />
+          </>
+        )}
       </button>
 
-      <p className="text-center text-sm text-slate-500">
-        No account?{' '}
-        <Link href="/auth/register" className="text-green-400 hover:text-green-300 font-medium transition">
-          Create one
+      {/* Register link */}
+      <p className="text-center text-sm text-slate-500 pt-1">
+        Don&apos;t have an account?{' '}
+        <Link href="/auth/register" className="text-green-400 hover:text-green-300 font-semibold transition-colors">
+          Create one free
         </Link>
       </p>
     </form>
