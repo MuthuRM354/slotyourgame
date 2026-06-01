@@ -251,7 +251,7 @@ export default function Home() {
       </div>
 
       {/* ── Active This Week ──────────────────────────────────────── */}
-      <section className="py-14 px-5" id="fixtures">
+      <section className="py-14 px-5">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
@@ -315,7 +315,7 @@ export default function Home() {
               <p className="text-white text-sm font-bold mb-1">Your fixture here</p>
               <p className="text-slate-500 text-xs mb-4">Schedule your team's matches</p>
               <Link href="/auth/register" className="btn-outline-green text-xs px-4 py-2 rounded-lg">
-                Get Started
+                Create Account
               </Link>
             </div>
           </div>
@@ -352,8 +352,8 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <Link href="/auth/register" className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm">
-              Schedule Your First Fixture <ArrowRight size={15} />
+            <Link href="/dashboard/fixtures" className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm">
+              View Fixtures <ArrowRight size={15} />
             </Link>
           </div>
 
@@ -433,7 +433,7 @@ export default function Home() {
       </section>
 
       {/* ── Feature 2: Ground Booking ─────────────────────────────── */}
-      <section className="py-20 px-5 border-t border-[#1c2432]/40" id="grounds">
+      <section className="py-20 px-5 border-t border-[#1c2432]/40">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-14 items-center">
 
           {/* Left: ground cards grid */}
@@ -498,7 +498,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <Link href="/auth/register" className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm">
+            <Link href="/grounds" className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm">
               Find a Ground <MapPin size={15} />
             </Link>
           </div>
@@ -506,7 +506,7 @@ export default function Home() {
       </section>
 
       {/* ── Feature 3: Player Stats + Leaderboard ─────────────────── */}
-      <section className="py-20 px-5 border-t border-[#1c2432]/40" id="stats">
+      <section className="py-20 px-5 border-t border-[#1c2432]/40">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-14 items-center">
 
           {/* Left: text */}
@@ -536,7 +536,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <Link href="/auth/register" className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm">
+            <Link href="/dashboard/stats" className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm">
               Track Your Stats <BarChart2 size={15} />
             </Link>
           </div>
@@ -580,7 +580,7 @@ export default function Home() {
             ))}
 
             <div className="px-5 py-4 text-center">
-              <Link href="/auth/register" className="text-xs text-green-400 hover:text-green-300 font-semibold transition-colors">
+              <Link href="/dashboard/stats" className="text-xs text-green-400 hover:text-green-300 font-semibold transition-colors">
                 See full leaderboard →
               </Link>
             </div>
@@ -622,7 +622,7 @@ export default function Home() {
       </section>
 
       {/* ── Role Tabs ────────────────────────────────────────────── */}
-      <div id="roles" className="border-t border-[#1c2432]/40">
+      <div className="border-t border-[#1c2432]/40">
         <RoleTabs />
       </div>
 
@@ -683,8 +683,14 @@ export default function Home() {
             <div>
               <p className="text-white font-semibold text-sm mb-3">Platform</p>
               <div className="space-y-2">
-                {['Fixture Management', 'Ground Booking', 'Player Stats', 'Leagues & Tournaments', 'Free Agent Board'].map((l) => (
-                  <p key={l}><Link href="/auth/register" className="text-slate-500 text-sm hover:text-slate-300 transition-colors">{l}</Link></p>
+                {[
+                  ['Fixture Management', '/dashboard/fixtures'],
+                  ['Ground Booking',     '/grounds'],
+                  ['Player Stats',       '/dashboard/stats'],
+                  ['Leagues & Tournaments', '/dashboard/leagues'],
+                  ['Free Agent Board',   '/dashboard/marketplace'],
+                ].map(([l, h]) => (
+                  <p key={l}><Link href={h} className="text-slate-500 text-sm hover:text-slate-300 transition-colors">{l}</Link></p>
                 ))}
               </div>
             </div>
@@ -692,8 +698,13 @@ export default function Home() {
             <div>
               <p className="text-white font-semibold text-sm mb-3">For</p>
               <div className="space-y-2">
-                {['Players', 'Team Captains', 'Ground Admins', 'League Organisers'].map((l) => (
-                  <p key={l}><Link href="/auth/register" className="text-slate-500 text-sm hover:text-slate-300 transition-colors">{l}</Link></p>
+                {[
+                  ['Players',          '/auth/register'],
+                  ['Team Captains',    '/auth/register'],
+                  ['Ground Admins',    '/auth/register'],
+                  ['League Organisers','/auth/register'],
+                ].map(([l, h]) => (
+                  <p key={l}><Link href={h} className="text-slate-500 text-sm hover:text-slate-300 transition-colors">{l}</Link></p>
                 ))}
               </div>
             </div>
