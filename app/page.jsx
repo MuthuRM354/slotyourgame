@@ -1,5 +1,3 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import RoleTabs from '@/components/landing/RoleTabs'
 import {
@@ -35,11 +33,7 @@ const LEADERBOARD = [
   { rank: 5, name: 'Karthik Siva', team: 'Hyderabad Hawks',  runs: 698,  wkts: 22, matches: 17 },
 ]
 
-export default async function Home() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (user) redirect('/dashboard')
-
+export default function Home() {
   return (
     <div className="min-h-screen bg-[#030711] text-white overflow-x-hidden">
 
@@ -56,11 +50,10 @@ export default async function Home() {
           </Link>
 
           <div className="hidden md:flex items-center gap-6 text-sm">
-            {[['Fixtures', '#fixtures'], ['Grounds', '#grounds'], ['Stats', '#stats'], ['Roles', '#roles']].map(([label, href]) => (
-              <a key={label} href={href} className="text-slate-400 hover:text-white transition-colors font-medium hover-underline">
-                {label}
-              </a>
-            ))}
+            <Link href="/grounds"   className="text-slate-400 hover:text-white transition-colors font-medium">Find Grounds</Link>
+            <Link href="/dashboard/leagues" className="text-slate-400 hover:text-white transition-colors font-medium">Leagues</Link>
+            <Link href="/dashboard/fixtures" className="text-slate-400 hover:text-white transition-colors font-medium">Fixtures</Link>
+            <Link href="/dashboard/marketplace" className="text-slate-400 hover:text-white transition-colors font-medium">Free Agents</Link>
           </div>
 
           <div className="flex items-center gap-2">
@@ -264,8 +257,8 @@ export default async function Home() {
             <div className="flex items-center gap-3">
               <span className="live-dot section-label">Active This Week</span>
             </div>
-            <Link href="/auth/register" className="text-xs text-green-400 hover:text-green-300 font-semibold flex items-center gap-1 transition-colors">
-              Join to see your fixtures <ArrowRight size={11} />
+            <Link href="/dashboard/fixtures" className="text-xs text-green-400 hover:text-green-300 font-semibold flex items-center gap-1 transition-colors">
+              View fixtures <ArrowRight size={11} />
             </Link>
           </div>
 
