@@ -1,6 +1,6 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
+import { logout } from '@/lib/auth'
 import { useRouter, usePathname } from 'next/navigation'
 import { LogOut, Bell, ChevronRight } from 'lucide-react'
 
@@ -33,10 +33,8 @@ export default function TopBar({ user, profile }) {
   const pathname = usePathname()
 
   async function handleSignOut() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
+    await logout()
     router.push('/auth/login')
-    router.refresh()
   }
 
   const displayName = profile?.full_name ?? user?.email ?? 'User'

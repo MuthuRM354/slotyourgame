@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import clsx from 'clsx'
 import { ROLE_LABELS } from '@/lib/rbac'
-import { createClient } from '@/lib/supabase/client'
+import { logout } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 
 const ROLE_BADGE = {
@@ -126,10 +126,8 @@ export default function Sidebar({ role, profile }) {
   const initials    = displayName.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
 
   async function handleSignOut() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
+    await logout()
     router.push('/auth/login')
-    router.refresh()
   }
 
   function isActive(href) {

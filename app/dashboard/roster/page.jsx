@@ -1,64 +1,22 @@
-﻿import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import PlayerRow from '@/components/roster/PlayerRow'
+'use client'
+
+import { useRole } from '@/lib/useRole'
 import RoleGuard from '@/components/shared/RoleGuard'
+import { Users } from 'lucide-react'
 
-export const metadata = { title: 'Roster — SlotYourGame' }
-
-export default async function RosterPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/login')
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
-
-  // League admins and super admins see all, captains/players see their team
-  const isAdmin = ['league_admin', 'super_admin'].includes(profile?.role)
-  let query = supabase.from('profiles').select('*, teams(name)')
-  if (!isAdmin) {
-    query = query.eq('team_id', profile?.team_id)
-  }
-  const { data: players } = await query.order('full_name')
+export default function RosterPage() {
+  const { role } = useRole()
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">
-          {isAdmin ? 'All Players' : 'Team Roster'}
-        </h2>
-        <span className="text-sm text-gray-400">{players?.length ?? 0} players</span>
+    <RoleGuard role={role} requiredRole="captain" redirect>
+      <div className="space-y-6 max-w-2xl">
+        <h2 className="text-2xl font-bold text-white">Team Roster</h2>
+        <div className="text-center py-16 text-slate-500">
+          <Users size={32} className="mx-auto mb-3 opacity-40" />
+          <p className="font-medium">Roster management coming soon</p>
+          <p className="text-sm mt-1">Invite players, manage your squad</p>
+        </div>
       </div>
-
-      <div className="bg-[#0c1117] rounded-xl border border-[#1c2432] overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-[#1c2432] text-xs text-gray-500 uppercase tracking-wider">
-              <th className="text-left p-4">Player</th>
-              <th className="text-left p-4 hidden sm:table-cell">Role</th>
-              <th className="text-left p-4 hidden md:table-cell">Team</th>
-              <th className="text-left p-4 hidden sm:table-cell">CricHeroes</th>
-              {profile?.role !== 'player' && profile?.role !== 'ground_admin' && <th className="text-right p-4">Actions</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {players?.map((player) => (
-              <PlayerRow
-                key={player.id}
-                player={player}
-                currentUserRole={profile?.role}
-                currentUserId={user.id}
-              />
-            ))}
-          </tbody>
-        </table>
-        {players?.length === 0 && (
-          <p className="text-center text-gray-500 py-10">No players found.</p>
-        )}
-      </div>
-    </div>
+    </RoleGuard>
   )
 }

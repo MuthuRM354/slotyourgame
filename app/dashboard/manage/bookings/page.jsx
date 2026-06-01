@@ -1,217 +1,89 @@
-﻿'use client'
+'use client'
 
-import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { bookingsApi } from '@/lib/api'
-import Badge from '@/components/ui/Badge'
-import EmptyState from '@/components/ui/EmptyState'
-import Tabs from '@/components/ui/Tabs'
-import { Calendar, Clock, IndianRupee, CheckCircle, XCircle, Users } from 'lucide-react'
-
-function BookingCard({ booking, onApprove, onReject }) {
-  const [action,  setAction]  = useState(null)   // 'approve' | 'reject'
-  const [reason,  setReason]  = useState('')
-  const [loading, setLoading] = useState(false)
-  const [done,    setDone]    = useState(false)
-  const [err,     setErr]     = useState('')
-
-  async function submit() {
-    setLoading(true)
-    setErr('')
-    try {
-      if (action === 'approve') await onApprove(booking.id)
-      else                      await onReject(booking.id, reason)
-      setDone(true)
-    } catch (e) {
-      setErr(e.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className={`bg-[#0c1117] border rounded-xl p-4 space-y-3 ${
-      done
-        ? action === 'approve' ? 'border-green-700/40' : 'border-red-700/40'
-        : 'border-[#1c2432]'
-    }`}>
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-semibold text-white">
-            Team booking · {booking.booking_date}
-          </p>
-          <div className="flex flex-wrap gap-3 text-xs text-gray-500 mt-1">
-            <span className="flex items-center gap-1">
-              <Clock size={11} /> {booking.start_time?.slice(0,5)} – {booking.end_time?.slice(0,5)}
-            </span>
-            {booking.total_price && (
-              <span className="flex items-center gap-0.5">
-                <IndianRupee size={10} /> {booking.total_price}
-              </span>
-            )}
-            {booking.opponent_team_id && (
-              <span className="flex items-center gap-1">
-                <Users size={11} /> Has opponent (match request)
-              </span>
-            )}
-          </div>
-          {booking.notes && (
-            <p className="text-xs text-gray-600 mt-1 italic">{booking.notes}</p>
-          )}
-        </div>
-        <Badge label={done ? (action === 'approve' ? 'confirmed' : 'rejected') : booking.status} />
-      </div>
-
-      {done ? (
-        <p className={`text-xs ${action === 'approve' ? 'text-green-400' : 'text-red-400'}`}>
-          {action === 'approve' ? '✓ Booking approved.' : '✗ Booking rejected.'}
-        </p>
-      ) : booking.status === 'pending' ? (
-        !action ? (
-          <div className="flex gap-2 pt-1">
-            <button
-              onClick={() => setAction('approve')}
-              className="flex items-center gap-1.5 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-700/30 px-3 py-1.5 rounded-lg transition"
-            >
-              <CheckCircle size={13} /> Approve
-            </button>
-            <button
-              onClick={() => setAction('reject')}
-              className="flex items-center gap-1.5 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-700/30 px-3 py-1.5 rounded-lg transition"
-            >
-              <XCircle size={13} /> Reject
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-2 border-t border-[#1c2432] pt-2">
-            <p className="text-xs font-medium text-white capitalize">{action} this booking?</p>
-            {action === 'reject' && (
-              <input
-                type="text"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder="Reason (shown to captain)…"
-                className="w-full bg-[#0a0f18] border border-[#1c2432] rounded-lg px-3 py-2 text-xs text-white"
-              />
-            )}
-            {err && <p className="text-xs text-red-400">{err}</p>}
-            <div className="flex gap-2">
-              <button
-                onClick={submit}
-                disabled={loading}
-                className={`text-xs px-3 py-1.5 rounded-lg transition font-medium ${
-                  action === 'approve'
-                    ? 'bg-green-500 hover:bg-green-400 text-black'
-                    : 'bg-red-500 hover:bg-red-400 text-white'
-                } disabled:opacity-50`}
-              >
-                {loading ? '…' : `Confirm ${action}`}
-              </button>
-              <button
-                onClick={() => { setAction(null); setReason(''); setErr('') }}
-                className="text-xs text-gray-500 hover:text-gray-300 px-2 py-1.5 transition"
-              >
-                Back
-              </button>
-            </div>
-          </div>
-        )
-      ) : null}
-    </div>
-  )
-}
+import { useEffect, useState } from 'react'
+import { CheckCircle2, XCircle, Loader2, AlertCircle } from 'lucide-react'
+import { useRole } from '@/lib/useRole'
+import RoleGuard from '@/components/shared/RoleGuard'
+import { groundsApi, bookingsApi } from '@/lib/api'
 
 export default function ManageBookingsPage() {
-  const [bookings, setBookings] = useState([])
-  const [groundId, setGroundId] = useState(null)
-  const [loading,  setLoading]  = useState(true)
+  const { role }                 = useRole()
+  const [bookings, setBookings]  = useState([])
+  const [loading,  setLoading]   = useState(true)
+  const [error,    setError]     = useState('')
+  const [actionId, setActionId]  = useState(null)
 
   useEffect(() => {
-    async function load() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+    if (!role || (role !== 'ground_admin' && role !== 'super_admin')) { setLoading(false); return }
+    groundsApi.list()
+      .then(async res => {
+        const ground = (res.data ?? [])[0]
+        if (ground) {
+          const bRes = await bookingsApi.forGround(ground.id)
+          setBookings(bRes.data ?? [])
+        }
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false))
+  }, [role])
 
-      const { data: ground } = await supabase
-        .from('grounds')
-        .select('id')
-        .eq('ground_admin_id', user.id)
-        .single()
-
-      if (!ground) { setLoading(false); return }
-      setGroundId(ground.id)
-
-      try {
-        const data = await bookingsApi.forGround(ground.id)
-        setBookings(data?.data ?? data ?? [])
-      } catch (e) {
-        console.error(e)
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [])
-
-  async function handleApprove(id) {
-    await bookingsApi.approve(id)
-    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status: 'confirmed' } : b))
+  async function act(id, action) {
+    setActionId(id)
+    try {
+      if (action === 'approve') await bookingsApi.approve(id)
+      else await bookingsApi.reject(id, 'Rejected by admin')
+      setBookings(b => b.map(bk => bk.id === id
+        ? { ...bk, status: action === 'approve' ? 'confirmed' : 'rejected' }
+        : bk))
+    } catch (e) { alert(e.message) }
+    finally { setActionId(null) }
   }
-
-  async function handleReject(id, reason) {
-    await bookingsApi.reject(id, reason)
-    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status: 'rejected', rejection_reason: reason } : b))
-  }
-
-  const pending   = bookings.filter((b) => b.status === 'pending')
-  const confirmed = bookings.filter((b) => b.status === 'confirmed')
-  const others    = bookings.filter((b) => !['pending','confirmed'].includes(b.status))
 
   return (
-    <div className="space-y-5">
-      <h2 className="text-2xl font-bold text-white">Manage Bookings</h2>
+    <RoleGuard role={role} requiredRole="ground_admin" redirect>
+      <div className="space-y-6 max-w-2xl">
+        <h2 className="text-2xl font-bold text-white">Booking Requests</h2>
 
-      {loading ? (
+        {loading && <div className="flex items-center gap-3 text-slate-400 py-10"><Loader2 size={16} className="animate-spin" /><span className="text-sm">Loading…</span></div>}
+        {error   && <div className="flex items-start gap-3 bg-red-500/8 border border-red-500/20 text-red-400 text-sm px-4 py-3.5 rounded-xl"><AlertCircle size={15} className="mt-0.5 shrink-0" /><span>{error}</span></div>}
+
+        {!loading && !error && bookings.length === 0 && (
+          <div className="text-center py-12 text-slate-500">
+            <CheckCircle2 size={28} className="mx-auto mb-2 opacity-40" />
+            <p className="text-sm">No bookings yet</p>
+          </div>
+        )}
+
         <div className="space-y-3">
-          {[1,2,3].map((i) => <div key={i} className="h-24 bg-[#0c1117] rounded-xl border border-[#1c2432] animate-pulse" />)}
+          {bookings.map(b => (
+            <div key={b.id} className="bg-[#0c1117] border border-[#1c2432] rounded-xl p-4">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <p className="font-semibold text-sm text-white">{b.teamName ?? b.team?.name ?? 'Team'}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{b.date} · {b.startTime} – {b.endTime}</p>
+                </div>
+                <span className={`text-xs px-2 py-0.5 rounded-full capitalize font-semibold border ${
+                  b.status === 'confirmed' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                  b.status === 'pending'   ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' :
+                  'bg-red-500/10 text-red-400 border-red-500/20'
+                }`}>{b.status}</span>
+              </div>
+              {b.status === 'pending' && (
+                <div className="flex gap-2 mt-3">
+                  <button onClick={() => act(b.id, 'approve')} disabled={actionId === b.id}
+                    className="flex items-center gap-1.5 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20 px-3 py-1.5 rounded-lg transition disabled:opacity-50">
+                    {actionId === b.id ? <Loader2 size={11} className="animate-spin" /> : <CheckCircle2 size={11} />} Approve
+                  </button>
+                  <button onClick={() => act(b.id, 'reject')} disabled={actionId === b.id}
+                    className="flex items-center gap-1.5 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-lg transition disabled:opacity-50">
+                    {actionId === b.id ? <Loader2 size={11} className="animate-spin" /> : <XCircle size={11} />} Reject
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-      ) : !groundId ? (
-        <EmptyState icon="🏟️" title="No ground assigned" description="You need a ground assigned to your account to manage bookings." />
-      ) : (
-        <Tabs tabs={['Pending', 'Confirmed', 'History']}>
-          {(tab) => (
-            <>
-              {tab === 'Pending' && (
-                pending.length === 0
-                  ? <EmptyState icon="✅" title="All caught up" description="No pending bookings to action." />
-                  : <div className="space-y-3">
-                      {pending.length > 0 && (
-                        <p className="text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-700/30 rounded-lg px-3 py-2">
-                          {pending.length} booking{pending.length > 1 ? 's' : ''} awaiting your approval
-                        </p>
-                      )}
-                      {pending.map((b) => (
-                        <BookingCard key={b.id} booking={b} onApprove={handleApprove} onReject={handleReject} />
-                      ))}
-                    </div>
-              )}
-              {tab === 'Confirmed' && (
-                confirmed.length === 0
-                  ? <EmptyState icon="📅" title="No confirmed bookings" />
-                  : <div className="space-y-3">
-                      {confirmed.map((b) => <BookingCard key={b.id} booking={b} onApprove={handleApprove} onReject={handleReject} />)}
-                    </div>
-              )}
-              {tab === 'History' && (
-                others.length === 0
-                  ? <EmptyState icon="📋" title="No history yet" />
-                  : <div className="space-y-3">
-                      {others.map((b) => <BookingCard key={b.id} booking={b} onApprove={handleApprove} onReject={handleReject} />)}
-                    </div>
-              )}
-            </>
-          )}
-        </Tabs>
-      )}
-    </div>
+      </div>
+    </RoleGuard>
   )
 }
