@@ -1,8 +1,8 @@
 ﻿'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { marketplaceApi } from '@/lib/api'
+import { useRole } from '@/lib/useRole'
 import EmptyState from '@/components/ui/EmptyState'
 import Tabs from '@/components/ui/Tabs'
 import { MapPin, Clock, Plus, Trash2, UserSearch } from 'lucide-react'
@@ -72,7 +72,7 @@ export default function MarketplacePage() {
   const [players,   setPlayers]   = useState([])
   const [mine,      setMine]      = useState([])
   const [loading,   setLoading]   = useState(false)
-  const [role,      setRole]      = useState('player')
+  const { role } = useRole()
 
   // Post form
   const [form, setForm]   = useState({ availableDate: '', city: '', preferredTimes: '', notes: '' })
@@ -82,17 +82,7 @@ export default function MarketplacePage() {
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
 
-  useEffect(() => {
-    async function loadRole() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data: p } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-      setRole(p?.role ?? 'player')
-    }
-    loadRole()
-    loadMine()
-  }, [])
+  useEffect(() => { loadMine() }, [])
 
   async function search() {
     setLoading(true)

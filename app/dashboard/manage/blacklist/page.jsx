@@ -1,8 +1,7 @@
 ﻿'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { blacklistApi } from '@/lib/api'
+import { blacklistApi, groundsApi } from '@/lib/api'
 import EmptyState from '@/components/ui/EmptyState'
 import { ShieldAlert, Trash2, Plus } from 'lucide-react'
 
@@ -54,19 +53,11 @@ export default function BlacklistPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-
-      const { data: ground } = await supabase
-        .from('grounds')
-        .select('id')
-        .eq('ground_admin_id', user.id)
-        .single()
-
-      if (!ground) { setLoading(false); return }
-      setGroundId(ground.id)
-
       try {
+        const gRes = await groundsApi.list()
+        const ground = (gRes.data ?? [])[0]
+        if (!ground) { setLoading(false); return }
+        setGroundId(ground.id)
         const data = await blacklistApi.list(ground.id)
         setEntries(data?.data ?? data ?? [])
       } catch (e) {

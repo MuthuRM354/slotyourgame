@@ -6,11 +6,10 @@ import Link from 'next/link'
 import { Eye, EyeOff, Loader2, CheckCircle2, User, Zap, Shield, AlertCircle, ArrowRight } from 'lucide-react'
 import { register } from '@/lib/auth'
 
-const ROLES = ['player', 'captain', 'ground_admin']
+const ROLES = ['player', 'captain']
 const ROLE_META = {
-  player:       { icon: User,   label: 'Player',       desc: 'Play for a team, mark attendance, track your stats.',                         idle: 'border-[#1c2432] bg-[#0a0f18] text-slate-500', active: 'border-blue-500/50 bg-blue-500/10 text-blue-300',     ring: 'ring-blue-500/20' },
-  captain:      { icon: Zap,    label: 'Captain',      desc: 'Lead a team, schedule fixtures, book grounds, recruit players.',               idle: 'border-[#1c2432] bg-[#0a0f18] text-slate-500', active: 'border-green-500/50 bg-green-500/10 text-green-300',   ring: 'ring-green-500/20' },
-  ground_admin: { icon: Shield, label: 'Ground Admin', desc: 'Manage your ground, approve bookings, control time slots.', idle: 'border-[#1c2432] bg-[#0a0f18] text-slate-500', active: 'border-orange-500/50 bg-orange-500/10 text-orange-300', ring: 'ring-orange-500/20' },
+  player:  { icon: User, label: 'Player',  desc: 'Play for a team, mark attendance, track your stats.',                idle: 'border-[#1c2432] bg-[#0a0f18] text-slate-500', active: 'border-blue-500/50 bg-blue-500/10 text-blue-300',   ring: 'ring-blue-500/20' },
+  captain: { icon: Zap,  label: 'Captain', desc: 'Lead a team, schedule fixtures, book grounds, recruit players.', idle: 'border-[#1c2432] bg-[#0a0f18] text-slate-500', active: 'border-green-500/50 bg-green-500/10 text-green-300', ring: 'ring-green-500/20' },
 }
 
 export default function RegisterForm() {

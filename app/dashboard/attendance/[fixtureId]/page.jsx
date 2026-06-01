@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { attendanceApi } from '@/lib/api'
+import { attendanceApi, fixturesApi } from '@/lib/api'
+import { useRole } from '@/lib/useRole'
+import { isCaptainOrAbove } from '@/lib/rbac'
 import Badge from '@/components/ui/Badge'
 import EmptyState from '@/components/ui/EmptyState'
 import { CheckCircle2, XCircle, HelpCircle, Users, Calendar, Clock } from 'lucide-react'
@@ -25,7 +26,7 @@ const RSVP_OPTIONS = [
   },
   {
     status: 'maybe',
-    label: 'Maybe',
+    label: "Maybe",
     icon: HelpCircle,
     color: 'bg-yellow-500/10 hover:bg-yellow-500/20 border-yellow-700/40 text-yellow-400',
     activeColor: 'bg-yellow-500/30 border-yellow-400 text-yellow-300',
@@ -66,53 +67,29 @@ export default function AttendancePage() {
   const [myStatus, setMyStatus] = useState(null)   // current user's response
   const [summary,  setSummary]  = useState(null)
   const [roster,   setRoster]   = useState([])
-  const [role,     setRole]     = useState('player')
+  const { role } = useRole()
   const [marking,  setMarking]  = useState(false)
   const [err,      setErr]      = useState('')
   const [loading,  setLoading]  = useState(true)
 
   useEffect(() => {
+    if (!role) return
     async function load() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      // Load fixture details from list
+      fixturesApi.list().then(r => {
+        const fix = (r.data ?? []).find(f => String(f.id) === String(fixtureId))
+        if (fix) setFixture(fix)
+      }).catch(() => {})
 
-      // Get role
-      const { data: p } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-      setRole(p?.role ?? 'player')
-
-      // Get fixture details from Supabase directly
-      const { data: fix } = await supabase
-        .from('fixtures')
-        .select('*')
-        .eq('id', fixtureId)
-        .single()
-      setFixture(fix)
-
-      // Load my RSVP
-      try {
-        const me = await attendanceApi.me(fixtureId)
-        setMyStatus(me?.status ?? 'pending')
-      } catch { setMyStatus('pending') }
-
-      // Load summary
-      try {
-        const s = await attendanceApi.summary(fixtureId)
-        setSummary(s)
-      } catch {}
-
-      // Load full roster (captain+)
-      if (['captain', 'league_admin', 'super_admin'].includes(p?.role)) {
-        try {
-          const list = await attendanceApi.list(fixtureId)
-          setRoster(list?.data ?? list ?? [])
-        } catch {}
+      try { const me = await attendanceApi.me(fixtureId);      setMyStatus(me?.data?.status ?? me?.status ?? 'pending') } catch { setMyStatus('pending') }
+      try { const s  = await attendanceApi.summary(fixtureId); setSummary(s?.data ?? s) } catch {}
+      if (isCaptainOrAbove(role)) {
+        try { const list = await attendanceApi.list(fixtureId); setRoster(list?.data ?? list ?? []) } catch {}
       }
-
       setLoading(false)
     }
     load()
-  }, [fixtureId])
+  }, [fixtureId, role])
 
   async function markRSVP(status) {
     setMarking(true)
@@ -130,7 +107,7 @@ export default function AttendancePage() {
     }
   }
 
-  const isCaptainPlus = ['captain', 'league_admin', 'super_admin'].includes(role)
+  const isCaptainPlus = isCaptainOrAbove(role)
   const total = summary ? (summary.total ?? Object.values(summary).reduce((a, b) => a + b, 0)) : 0
 
   return (
