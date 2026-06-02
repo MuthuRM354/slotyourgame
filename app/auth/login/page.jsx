@@ -40,7 +40,7 @@ export default function LoginPage() {
           {/* Feature list */}
           <div className="space-y-3">
             {[
-              { icon: Shield,  color: 'text-green-400',  bg: 'bg-green-500/10 border-green-500/20',  text: 'Secure Supabase authentication' },
+              { icon: Shield,  color: 'text-green-400',  bg: 'bg-green-500/10 border-green-500/20',  text: 'Secure JWT authentication' },
               { icon: Trophy,  color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20', text: 'Full league & standings management' },
               { icon: Users,   color: 'text-blue-400',   bg: 'bg-blue-500/10 border-blue-500/20',    text: 'Role-based dashboards for every member' },
             ].map(({ icon: Icon, color, bg, text }) => (
