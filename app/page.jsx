@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {
   Calendar, MapPin, BarChart2, Trophy,
-  UserSearch, ArrowRight, Zap, ChevronRight,
+  UserSearch, ArrowRight, ChevronRight,
   Building2, Search, Clock,
 } from 'lucide-react'
 
@@ -110,9 +110,13 @@ export default function Home() {
         <nav className="absolute top-5 inset-x-5 z-20">
           <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 bg-black/40 backdrop-blur-md border border-white/10 rounded-full pl-4 pr-2 py-2">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-[#00d4ff]/20 border border-[#00d4ff]/40 flex items-center justify-center">
-                <Zap size={13} className="text-[#5eeaff]" />
-              </div>
+              <Image
+                src="/logo/SlotYourGame Logo v4 Booking-selection_mobile logo.png"
+                alt="SlotYourGame"
+                width={28}
+                height={28}
+                className="rounded-lg"
+              />
               <span className="font-extrabold text-sm tracking-tight text-white">
                 Slot<span className="text-[#5eeaff]">YourGame</span>
               </span>
@@ -271,9 +275,13 @@ export default function Home() {
       <footer className="border-t border-[#1d2942]/60 px-5 py-10">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[#00d4ff]/15 border border-[#00d4ff]/30 flex items-center justify-center">
-              <Zap size={13} className="text-[#5eeaff]" />
-            </div>
+            <Image
+              src="/logo/SlotYourGame Logo v4 Booking-selection_mobile logo.png"
+              alt="SlotYourGame"
+              width={28}
+              height={28}
+              className="rounded-lg"
+            />
             <span className="font-extrabold text-[14px]">Slot<span className="text-[#5eeaff]">YourGame</span></span>
           </div>
 

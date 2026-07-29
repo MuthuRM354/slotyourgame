@@ -1,6 +1,6 @@
 import RegisterForm from '@/components/auth/RegisterForm'
 import Link from 'next/link'
-import { Zap, Calendar, BarChart2, MapPin } from 'lucide-react'
+import Image from 'next/image'
 
 export const metadata = { title: 'Create Account — SlotYourGame' }
 
@@ -15,9 +15,13 @@ export default function RegisterPage() {
 
         {/* Logo */}
         <div className="relative flex items-center gap-2.5 z-10">
-          <div className="w-9 h-9 rounded-xl bg-green-500/15 border border-green-500/30 flex items-center justify-center glow-green-xs">
-            <Zap size={18} className="text-green-400" />
-          </div>
+          <Image
+            src="/logo/SlotYourGame Logo v4 Booking-selection_mobile logo.png"
+            alt="SlotYourGame"
+            width={36}
+            height={36}
+            className="rounded-xl"
+          />
           <span className="text-white font-bold text-lg tracking-tight">
             Slot<span className="text-green-400">YourGame</span>
           </span>
@@ -72,9 +76,13 @@ export default function RegisterPage() {
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-green-500/15 border border-green-500/30 flex items-center justify-center">
-                <Zap size={15} className="text-green-400" />
-              </div>
+              <Image
+                src="/logo/SlotYourGame Logo v4 Booking-selection_mobile logo.png"
+                alt="SlotYourGame"
+                width={32}
+                height={32}
+                className="rounded-lg"
+              />
               <span className="text-white font-bold text-[15px]">
                 Slot<span className="text-green-400">YourGame</span>
               </span>

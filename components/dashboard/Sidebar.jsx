@@ -1,11 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Calendar, Users, BarChart2,
   MapPin, BookOpen, ShieldAlert, Trophy, UserSearch,
-  Building2, ListChecks, ClipboardCheck, Zap, LogOut,
+  Building2, ListChecks, ClipboardCheck, LogOut,
 } from 'lucide-react'
 import clsx from 'clsx'
 import { ROLE_LABELS } from '@/lib/rbac'
@@ -141,9 +142,13 @@ export default function Sidebar({ role, profile }) {
       {/* ── Logo ─────────────────────────────────────────── */}
       <div className="h-14 px-3 sm:px-4 flex items-center border-b border-[#1c2432] shrink-0">
         <Link href="/dashboard" className="flex items-center gap-2.5 group">
-          <div className="w-7 h-7 rounded-lg bg-green-500/15 border border-green-500/25 flex items-center justify-center group-hover:border-green-500/40 group-hover:bg-green-500/20 transition-all glow-green-xs shrink-0">
-            <Zap size={13} className="text-green-400" />
-          </div>
+          <Image
+            src="/logo/SlotYourGame Logo v4 Booking-selection_mobile logo.png"
+            alt="SlotYourGame"
+            width={28}
+            height={28}
+            className="rounded-lg shrink-0"
+          />
           <span className="hidden sm:block text-[13px] font-extrabold tracking-tight leading-none">
             Slot<span className="text-green-400">YourGame</span>
           </span>
