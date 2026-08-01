@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SlotYourGame
+
+A cricket team management and ground-booking platform for grassroots cricket in India — schedule fixtures, book grounds, track player stats, and run leagues, all in one place.
+
+**Live repo:** [MuthuRM354/slotyourgame](https://github.com/MuthuRM354/slotyourgame)
+
+## Features
+
+- **Ground booking** — browse verified cricket grounds, check slot availability, and book instantly
+- **Fixture management** — schedule T20s, nets, and tournaments; players RSVP with one tap
+- **Player stats & leaderboards** — track runs, wickets, and match history
+- **League management** — organize and run leagues/tournaments
+- **Team roster & attendance** tracking
+- **Marketplace** for gear/equipment
+- **Wallet** for payments
+- **Role-based access control** — `player`, `captain`, `ground_admin` (venue owner), `league_admin`, `super_admin`, mirroring a Java backend's `UserRole` enum
+
+## Tech Stack
+
+- **Next.js 16** (App Router)
+- **React 19**
+- **Tailwind CSS 4**
+- **lucide-react** for icons
+- Integrates with a separate Java/Spring backend (role names are normalized from the backend's enum in `lib/rbac.js`)
+
+## Project Structure
+
+```
+app/
+├── page.jsx                # Landing page
+├── auth/                   # Login / register
+├── grounds/                # Ground listing & detail ([id])
+├── bookings/                # User bookings
+├── wallet/                  # Wallet & payments
+├── profile/                  # User profile
+├── setup/                    # Onboarding/setup flow
+└── dashboard/
+    ├── bookings/  fixtures/  leagues/  roster/
+    ├── attendance/  availability/  grounds/
+    ├── manage/  marketplace/  stats/
+    └── layout.jsx, page.jsx
+
+components/
+├── auth/                   # Auth-related components
+├── dashboard/               # Sidebar, TopBar
+├── shared/                  # RoleGuard (RBAC gate)
+└── ui/                      # Shared UI primitives
+
+lib/
+├── api.js                   # API client
+├── auth.js                   # Auth helpers
+├── rbac.js                   # Role hierarchy & permission checks
+└── useRole.js                 # Hook for current user's role
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm
+
+### Installation
+
+```bash
+git clone https://github.com/MuthuRM354/slotyourgame.git
+cd slotyourgame
+npm install
+```
+
+### Run locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Build for production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Roles & Permissions
 
-To learn more about Next.js, take a look at the following resources:
+Role hierarchy (lowest to highest): `player` → `captain` → `ground_admin` → `league_admin` → `super_admin`. `ground_admin` is scoped (can only act as itself or be overridden by `super_admin`); other roles inherit permissions from roles below them. See `lib/rbac.js` for the exact rules and `components/shared/RoleGuard.jsx` for how routes/UI enforce them.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Not yet specified.
